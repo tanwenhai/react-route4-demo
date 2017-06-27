@@ -8,8 +8,18 @@ import {
   Link
 } from 'react-router-dom'
 
-import loadAbout from 'bundle-loader?lazy&name=about!./loadAbout'
-import loadDashboard from 'bundle-loader?lazy&name=dashboard!./loadDashboard'
+const routes = [
+  { 
+    path: '/about',
+    component: require('bundle-loader?lazy&name=about!./loadAbout')
+  },
+  { 
+    path: '/dashboard',
+    component: require('bundle-loader?lazy&name=dashboard!./loadDashboard')
+  }
+]
+console.log(routes)
+
 // components load their module for initial visit
 const About = (props) => (
   <Bundle load={loadAbout}>
@@ -23,6 +33,14 @@ const Dashboard = (props) => (
   </Bundle>
 )
 
+const RouteWithSubRoutes = (route) => (
+  <Route path={route.path} render={props => (
+    <Bundle load={route.component}>
+      {(LazyRoute) => <LazyRoute {...props}/>}
+    </Bundle>
+  )}/>
+)
+
 export default class App extends React.Component {
   componentDidMount () {
     // preloads the rest
@@ -34,11 +52,17 @@ export default class App extends React.Component {
       <Router>
         <div>
           <h1>Welcome!</h1>
-          <Link to="/about">about</Link>
-          <Link to="/dashboard">dashboard</Link>
-          <Route path="/" component={() => <div>123</div>}/>
-          <Route path="/about" component={About}/>
-          <Route path="/dashboard" component={Dashboard}/>
+          <ul>
+            <li>
+              <Link to="/about">about</Link>
+            </li>
+            <li>
+              <Link to="/dashboard">dashboard</Link>
+            </li>
+          </ul>
+          {routes.map((route, i) => (
+            <RouteWithSubRoutes key={i} {...route}/>
+          ))}
         </div>
       </Router>
     )

@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import NProgress from 'NProgress';
+import 'NProgress/NProgress.css';
 
 class Bundle extends Component {
   state = {
@@ -17,10 +19,12 @@ class Bundle extends Component {
   }
 
   load(props) {
+    NProgress.start();
     this.setState({
       mod: null
     })
     props.load((mod) => {
+      NProgress.done();
       this.setState({
         // handle both es imports and cjs
         mod: mod.default ? mod.default : mod
